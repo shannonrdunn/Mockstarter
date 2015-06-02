@@ -19,7 +19,12 @@ module Mockstarter
        end
       end if params.is_a? Hash
       @redis = Redis.new(:host => "192.168.59.103",
-                          :port => 6379)
+                         :port => 6379)
+
+      unless luhn_check
+        puts "Not a valid credit card."
+        exit
+      end
     end
 
 
@@ -35,13 +40,27 @@ module Mockstarter
                     @amount)
     end
 
-    def card_check
-      ### TODO: create credit card check
+    def luhn_check
+      # Luhn check stolen from wikipedia, not my code.
+      s1 = s2 = 0
+      @creditcard.to_s.reverse.chars.each_slice(2) do |odd, even|
+        s1 += odd.to_i
+
+        double = even.to_i * 2
+        double -= 9 if double >= 10
+        s2 += double
+      end
+      (s1 + s2) % 10 == 0
     end
 
     def list_user
       puts @redis.hgetall('user:transaction:' + @username)
     end
+
+    def card_exists
+      ## check existence of card
+    end
+
 
   end
 
@@ -61,7 +80,7 @@ module Mockstarter
       end if params.is_a? Hash
 
       @redis = Redis.new(:host => "192.168.59.103",
-                          :port => 6379)
+                         :port => 6379)
       @progress = progress
     end
 
