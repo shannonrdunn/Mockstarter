@@ -21,13 +21,13 @@ module Mockstarter
     ].freeze
 
     def initialize(params)
-      # cast each param as a instance variable.
+      ## Cast each param as a instance variable.
       params.each do |key, value|
        if value && VALID_PARAMS.include?(key.to_s)
          instance_variable_set("@#{key}", value)
        end
       end if params.is_a? Hash
-      # establish redis connection
+      ## Establish redis connection, from environment variable
       @redis = Redis.new(:url => ENV['MOCKSTARTER_BRAIN'])
     end
 
@@ -52,12 +52,14 @@ module Mockstarter
         fail ArgumentError, "Credit card number too large (must be less than 19)."
       when luhn_check == false
         fail ArgumentError, "Not valid card."
+      when duplicate_card == true
+        fail ArgumentError, "Credit taken by another user"
       end
       return true
     end
 
     def luhn_check
-      # Luhn check stolen from wikipedia, not my code.
+      ## Luhn check stolen from wikipedia, not my code.
       s1 = s2 = 0
       @creditcard.to_s.reverse.chars.each_slice(2) do |odd, even|
         s1 += odd.to_i
@@ -67,6 +69,18 @@ module Mockstarter
         s2 += double
       end
       (s1 + s2) % 10 == 0
+    end
+
+    def duplicate_card
+      all_users = @redis.smembers('user_set')
+      all_users.delete(@username)
+      all_users.map { |u|
+        puts u
+        if @redis.get('user:creditcard:' + u) == @creditcard
+          return true
+        end
+      }
+      return false
     end
 
     def log
@@ -86,7 +100,7 @@ module Mockstarter
     ].freeze
 
     def initialize(params)
-      # Read params, set as instance variables
+      ## Read params, set as instance variables
       params.each do |key, value|
        if value && VALID_PARAMS.include?(key.to_s)
          instance_variable_set("@#{key}", value)
@@ -125,7 +139,7 @@ module Mockstarter
     end
 
     def funded
-      # is Project success yet? return boolean
+      ## is Project success yet? return boolean
       if @progress >= @redis.get('project:goal:' + @projectname).to_i
         return true
       else
@@ -134,6 +148,7 @@ module Mockstarter
     end
 
     def name_verify
+      ## Test cases for bad names.
       case
       when @projectname.size < 4
         fail ArgumentError, "Project name is too short(less than 4 characters)"
