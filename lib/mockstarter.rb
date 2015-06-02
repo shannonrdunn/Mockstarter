@@ -58,8 +58,6 @@ module Mockstarter
         fail ArgumentError, "Not valid card."
       when duplicate_card == true
         fail ArgumentError, "Credit taken by another user"
-      when duplicate_card == true
-        fail ArgumentError, "Credit taken by another user"
       end
       return true
     end
