@@ -1,4 +1,4 @@
-#require "mockstarter/version"
+require "mockstarter/version"
 require "redis"
 require "json"
 
@@ -21,32 +21,31 @@ module Mockstarter
       # establish redis connection
       @redis = Redis.new(:host => "192.168.59.103",
                          :port => 6379)
-      # check luhn! if fail than exit, probably something better.
-      unless luhn_check
-        Raise "Not a valid credit card."
-        exit
-      end
-
     end
 
-
     def transaction
-      @redis.sadd('user_set', @username)
-  #    if card_unique
-  #      raise "Credit card already in use by another user."
-  #    else
-        # Transaction id, based on unix epoch
-        # needs to be done better
-        id = Time.now.to_i.to_s
-        @redis.set('user:creditcard:' + @username,
-                      @creditcard)
-        @redis.hset('user:transaction:' + @username,
-                      @projectname + ":" + id,
-                      @amount)
-        @redis.hset('project:transaction:' + @projectname,
-                      @username + ":" + id,
-                      @amount)
+      unless card_verify == false
+        @redis.sadd('user_set', @username)
+          id = Time.now.to_i.to_s
+          @redis.set('user:creditcard:' + @username,
+                        @creditcard)
+          @redis.hset('user:transaction:' + @username,
+                        @projectname + ":" + id,
+                        @amount)
+          @redis.hset('project:transaction:' + @projectname,
+                        @username + ":" + id,
+                        @amount)
       end
+    end
+
+    def card_verify
+      case
+      when @creditcard.to_s.size > 19
+        fail ArgumentError, "Credit card number too large (must be less than 19)."
+      when luhn_check == false
+        fail ArgumentError, "Not valid card."
+      end
+      return true
     end
 
     def luhn_check
@@ -62,24 +61,16 @@ module Mockstarter
       (s1 + s2) % 10 == 0
     end
 
-    def card_unique
-      users = @redis.smembers('user_set')
-      users.map { |e|
-        if @redis.get('user:creditcard:' + e) == @creditcard
-            e == @username
-            return false
-          end
-        else
-          return true
-        end
+    def log
+      array = Array.new
+      transactions = @redis.hgetall('user:transaction:' + @username)
+      transactions.map { |k,v|
+        array.push("Backed #{k} for $#{v}")
       }
+      return array
     end
-
-    def list_user
-      @redis.hgetall('user:transaction:' + @username)
-    end
-
   end
+
   class Project
     VALID_PARAMS = [
       "projectname",
@@ -100,13 +91,15 @@ module Mockstarter
     end
 
     def create
-      # Creat a project and goal
-      @@redis.set('project:goal:' + @projectname,
-                   @goal)
+      # Creat a project with a goal
+      unless name_verify == false
+        @redis.set('project:goal:' + @projectname,
+                     @goal)
+      end
     end
 
     def progress
-      # Count and return total contributions
+      # Count and return total contributions for a given project
       total = 0
       transactions = @redis.hgetall('project:transaction:' + @projectname)
       transactions.map { |k,v|
@@ -115,14 +108,33 @@ module Mockstarter
       return total
     end
 
+    def log
+      array = Array.new
+      transactions = @redis.hgetall('project:transaction:' + @projectname)
+      transactions.map { |k,v|
+        array.push("#{k} backed for $#{v}")
+      }
+      return array
+    end
+
     def funded
       # is Project success yet? return boolean
-      if progress >= @goal
+      if @progress >= @redis.get('project:goal:' + @projectname).to_i
         return true
       else
         return false
       end
     end
-  end
 
+    def name_verify
+      case
+      when @projectname.size < 4
+        fail ArgumentError, "Project name is too short(less than 4 characters)"
+      when @projectname.size > 19
+        fail ArgumentError, "Project name is too large(more than 19 characters)"
+      end
+        return true
+    end
+
+  end
 end
