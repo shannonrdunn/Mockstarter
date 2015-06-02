@@ -26,12 +26,16 @@ describe Mockstarter do
     before do
       @good_name = Mockstarter::Project.new(:projectname => 'Project')
       @short_name = Mockstarter::Project.new(:projectname => 'Pro')
+      @space_name = Mockstarter::Project.new(:projectname => 'Pro ')
     end
     it 'good name should pass name verification' do
       @good_name.name_verify == true
     end
     it 'short name should raise ArgumentError' do
       expect { @short_name.name_verify }.to raise_error(ArgumentError)
+    end
+    it 'space in project name should raise ArgumentError' do
+      expect { @space_name.name_verify }.to raise_error(ArgumentError)
     end
   end
 end

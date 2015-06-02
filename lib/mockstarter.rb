@@ -157,13 +157,14 @@ module Mockstarter
     end
 
     def name_verify
-      ## TODO: Test cases for bad names.
+      ## Tests for size, and characters in string, and if it already exists.
       case
-      when @projectname
       when @projectname.size < 4
         fail ArgumentError, "Project name is too short(less than 4 characters)"
       when @projectname.size > 19
         fail ArgumentError, "Project name is too large(more than 19 characters)"
+      when (@projectname =~ /[^a-zA-Z0-9\-\_]/) != nil
+        fail ArgumentError, "Project names can only have a-zA-Z, -, _"
       when @redis.get('project:goal:' + @projectname) != nil
         fail ArgumentError, "Project already exists!"
       end
