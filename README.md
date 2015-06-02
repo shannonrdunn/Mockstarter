@@ -21,6 +21,12 @@ Run the rake command to build and install the gem, from the root of the git repo
 bundle exec rake install
 ```
 
+This application request redis to be somewhere. Its the mockstarter brain. Export the redis url as a env variable.
+
+```
+export MOCKSTARTER_BRAIN=redis://localhost:6379
+```
+
 ## Usage
 
 You are ready to start your project. Create it!
