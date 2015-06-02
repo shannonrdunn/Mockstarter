@@ -3,9 +3,6 @@
 require 'mockstarter'
 require 'thor'
 
-fund = Mockstarter::Fund.new(:username => "sdunn", :projectname => "kung fury", :amount => 823, :creditcard => 4342562230449520)
-project = Mockstarter::Project.new(:projectname => "kung fury", :goal => 50000)
-
 class MockStarterCLI < Thor
   desc "project PROJECTNAME GOAL", "create a project by PROJECTNAME for given GOAL"
   def project(projectname, goal)
