@@ -19,8 +19,7 @@ module Mockstarter
        end
       end if params.is_a? Hash
       # establish redis connection
-      @redis = Redis.new(:host => "192.168.59.103",
-                         :port => 6379)
+      @redis = Redis.new(:url => ENV['MOCKSTARTER_BRAIN'])
     end
 
     def transaction
@@ -85,8 +84,7 @@ module Mockstarter
        end
       end if params.is_a? Hash
 
-      @redis = Redis.new(:host => "192.168.59.103",
-                         :port => 6379)
+      @redis = Redis.new(:url => ENV['MOCKSTARTER_BRAIN'])
       @progress = progress
     end
 

@@ -36,4 +36,9 @@ class MockStarterCLI < Thor
 
 end
 
+## Ensure that the MOCKSTARTER_BRAIN environment variable is set before starting the CLI.
+if ENV['MOCKSTARTER_BRAIN'].nil?
+  raise ArgumentError, 'You must set MOCKSTARTER_BRAIN env variable to redis url'
+end
+
 MockStarterCLI.start(ARGV)
