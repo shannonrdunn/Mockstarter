@@ -2,6 +2,15 @@ require "mockstarter/version"
 require "redis"
 require "json"
 
+
+## Core Mockstarter module
+## There are two main classes, Fund and Project. Fund is for mainly funding
+## a project and checking CC info. Project is for manipulation of Projects and
+## users.
+
+## TODO: Handle errors for existing projects, and credit cards.
+## TODO: Moar tests.
+
 module Mockstarter
   class Fund
     VALID_PARAMS = [
