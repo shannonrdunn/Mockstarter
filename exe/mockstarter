@@ -22,8 +22,10 @@ class MockStarterCLI < Thor
   def list(projectname)
     project = Mockstarter::Project.new(:projectname => projectname)
     project.log.each {|e| puts "-- " + e.sub(/(:*[:0-9][^\s]+)/,"") + "\n"}
-    if project.funded
+    if project.funded == true
       puts "#{projectname} is SUCCESSFUL!"
+    else
+      puts "#{projectname} needs $#{project.funded} more to be SUCCESSFUL"
     end
   end
 

@@ -8,7 +8,6 @@ require "json"
 ## a project and checking CC info. Project is for manipulation of Projects and
 ## users.
 
-## TODO: Handle errors for existing projects, and credit cards.
 ## TODO: Moar tests.
 
 module Mockstarter
@@ -153,10 +152,11 @@ module Mockstarter
 
     def funded
       ## is Project success yet? return boolean
-      if @progress >= @redis.get('project:goal:' + @projectname).to_i
+      goal = @redis.get('project:goal:' + @projectname).to_i
+      if @progress >= goal
         return true
       else
-        return false
+        return goal - @progress
       end
     end
 
