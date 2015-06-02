@@ -98,7 +98,7 @@ module Mockstarter
     end
 
     def create
-      # Creat a project with a goal
+      ## Ensure name passes verification, then create the project in redis.
       unless name_verify == false
         @redis.set('project:goal:' + @projectname,
                      @goal)
@@ -139,6 +139,8 @@ module Mockstarter
         fail ArgumentError, "Project name is too short(less than 4 characters)"
       when @projectname.size > 19
         fail ArgumentError, "Project name is too large(more than 19 characters)"
+      when @redis.get('project:goal:' + @projectname) != nil
+        fail ArgumentError, "Project already exists!"
       end
         return true
     end
