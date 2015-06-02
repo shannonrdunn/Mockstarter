@@ -8,18 +8,20 @@ class MockStarterCLI < Thor
   def project(projectname, goal)
     project = Mockstarter::Project.new(:projectname => projectname, :goal => goal)
     project.create
+    say "Created new campaign #{projectname} with goal of $#{goal}!"
   end
 
   desc "back USERNAME PROJECTNAME CREDITCARD AMOUNT", "fund a project for USERNAME to PROJECTNAME with CREDITCARD for AMOUNT"
   def back(name, projectname, creditcard, amount)
     project = Mockstarter::Fund.new(:username => name, :projectname => projectname, :amount => amount, :creditcard => creditcard)
     project.transaction
+    say "Backed #{projectname} with amount of $#{project.instance_variable_get(:@amount)}!"
   end
 
   desc "list PROJECTNAME", "show backers for PROJECTNAME"
   def list(projectname)
     project = Mockstarter::Project.new(:projectname => projectname)
-    project.log.each {|e| puts "-- " + e + "\n"}
+    project.log.each {|e| puts "-- " + e.sub(/(:*[:0-9][^\s]+)/,"") + "\n"}
     if project.funded
       puts "#{projectname} is SUCCESSFUL!"
     end
@@ -28,7 +30,7 @@ class MockStarterCLI < Thor
   desc "backer USERNAME", "get projects backed by USERNAME"
   def backer(username)
     project = Mockstarter::Fund.new(:username => username)
-    project.log.each {|e| puts "-- " + e + "\n"}
+    project.log.each {|e| puts "-- " + e.sub(/(:*[:0-9][^\s]+)/,"") + "\n"}
   end
 
 end
