@@ -9,6 +9,7 @@ describe Mockstarter do
       @good_card = Mockstarter::Fund.new(:creditcard => 378282246310005)
       @bad_card = Mockstarter::Fund.new(:creditcard => 4242424242424241)
       @long_card = Mockstarter::Fund.new(:creditcard => 424242424242424121211231231232)
+      @string_card = Mockstarter::Fund.new(:creditcard => 3782822e46310005)
     end
     it 'good card number should pass card verification' do
       @good_card.card_verify == true

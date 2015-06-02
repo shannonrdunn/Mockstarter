@@ -54,6 +54,8 @@ module Mockstarter
         fail ArgumentError, "Not valid card."
       when duplicate_card == true
         fail ArgumentError, "Credit taken by another user"
+      when duplicate_card == true
+        fail ArgumentError, "Credit taken by another user"
       end
       return true
     end
@@ -148,7 +150,7 @@ module Mockstarter
     end
 
     def name_verify
-      ## Test cases for bad names.
+      ## TODO: Test cases for bad names.
       case
       when @projectname.size < 4
         fail ArgumentError, "Project name is too short(less than 4 characters)"
