@@ -32,6 +32,8 @@ module Mockstarter
     end
 
     def transaction
+      ## Call this method on the object and it will verify your card number
+      ## and then pass the values to fund the project
       unless card_verify == false
         @redis.sadd('user_set', @username)
           id = Time.now.to_i.to_s
@@ -47,6 +49,7 @@ module Mockstarter
     end
 
     def card_verify
+      ## Credit card verifications tests
       case
       when @creditcard.to_s.size > 19
         fail ArgumentError, "Credit card number too large (must be less than 19)."
@@ -74,6 +77,8 @@ module Mockstarter
     end
 
     def duplicate_card
+      ## Check for duplicate card
+      ## Pulls all users, deletes your own, looks up card for each user.
       all_users = @redis.smembers('user_set')
       all_users.delete(@username)
       all_users.map { |u|
@@ -86,6 +91,7 @@ module Mockstarter
     end
 
     def log
+      ## Log all user transactions
       array = Array.new
       transactions = @redis.hgetall('user:transaction:' + @username)
       transactions.map { |k,v|
@@ -132,6 +138,7 @@ module Mockstarter
     end
 
     def log
+      ## Log new transactions for projects
       array = Array.new
       transactions = @redis.hgetall('project:transaction:' + @projectname)
       transactions.map { |k,v|
@@ -152,6 +159,7 @@ module Mockstarter
     def name_verify
       ## TODO: Test cases for bad names.
       case
+      when @projectname
       when @projectname.size < 4
         fail ArgumentError, "Project name is too short(less than 4 characters)"
       when @projectname.size > 19
