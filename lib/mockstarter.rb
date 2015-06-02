@@ -29,6 +29,8 @@ module Mockstarter
       end if params.is_a? Hash
       ## Establish redis connection, from environment variable
       @redis = Redis.new(:url => ENV['MOCKSTARTER_BRAIN'])
+      ## round amount to nearest 100th
+      @amount = (@amount.to_f * 100).round / 100.00
     end
 
     def transaction
@@ -65,6 +67,7 @@ module Mockstarter
 
     def luhn_check
       ## Luhn check stolen from wikipedia, not my code.
+      ## works great
       s1 = s2 = 0
       @creditcard.to_s.reverse.chars.each_slice(2) do |odd, even|
         s1 += odd.to_i
@@ -117,6 +120,7 @@ module Mockstarter
 
       @redis = Redis.new(:url => ENV['MOCKSTARTER_BRAIN'])
       @progress = progress
+      @goal = (@goal.to_f * 100).round / 100.00
     end
 
     def create
