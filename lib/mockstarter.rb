@@ -149,7 +149,7 @@ module Mockstarter
     end
 
     def funded
-      ## is Project success yet? return boolean
+      ## is Project success yet? return boolean if true if false returns how much more it needs
       goal = @redis.get('project:goal:' + @projectname).to_i
       if @progress >= goal
         return true
