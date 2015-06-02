@@ -6,11 +6,34 @@ require 'thor'
 fund = Mockstarter::Fund.new(:username => "sdunn", :projectname => "kung fury", :amount => 823, :creditcard => 4342562230449520)
 project = Mockstarter::Project.new(:projectname => "kung fury", :goal => 50000)
 
-class MyCLI < Thor
-  desc "hello NAME", "say hello to NAME"
-  def hello(name)
-    puts "Hello #{name}"
+class MockStarterCLI < Thor
+  desc "project PROJECTNAME GOAL", "create a project by PROJECTNAME for given GOAL"
+  def project(projectname, goal)
+    project = Mockstarter::Project.new(:projectname => projectname, :goal => goal)
+    project.create
   end
+
+  desc "back USERNAME PROJECTNAME CREDITCARD AMOUNT", "fund a project for USERNAME to PROJECTNAME with CREDITCARD for AMOUNT"
+  def back(name, projectname, creditcard, amount)
+    project = Mockstarter::Fund.new(:username => name, :projectname => projectname, :amount => amount, :creditcard => creditcard)
+    project.transaction
+  end
+
+  desc "list PROJECTNAME", "show backers for PROJECTNAME"
+  def list(projectname)
+    project = Mockstarter::Project.new(:projectname => projectname)
+    project.log.each {|e| puts "-- " + e + "\n"}
+    if project.funded
+      puts "#{projectname} is SUCCESSFUL!"
+    end
+  end
+
+  desc "backer USERNAME", "get projects backed by USERNAME"
+  def backer(username)
+    project = Mockstarter::Fund.new(:username => username)
+    project.log.each {|e| puts "-- " + e + "\n"}
+  end
+
 end
 
-MyCLI.start(ARGV)
+MockStarterCLI.start(ARGV)
