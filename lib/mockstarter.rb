@@ -8,15 +8,14 @@ require "json"
 ## a project and checking CC info. Project is for manipulation of Projects and
 ## users.
 
-## TODO: Moar tests.
-
 module Mockstarter
   class Fund
     VALID_PARAMS = [
       "username",
       "projectname",
       "amount",
-      "creditcard"
+      "creditcard",
+      "redis"
     ].freeze
 
     def initialize(params)
@@ -26,8 +25,6 @@ module Mockstarter
          instance_variable_set("@#{key}", value)
        end
       end if params.is_a? Hash
-      ## Establish redis connection, from environment variable
-      @redis = Redis.new(:url => ENV['MOCKSTARTER_BRAIN'])
       ## round amount to nearest 100th
       @amount = (@amount.to_f * 100).round / 100.00
     end
@@ -104,7 +101,8 @@ module Mockstarter
   class Project
     VALID_PARAMS = [
       "projectname",
-      "goal"
+      "goal",
+      "redis"
     ].freeze
 
     def initialize(params)
@@ -115,7 +113,6 @@ module Mockstarter
        end
       end if params.is_a? Hash
 
-      @redis = Redis.new(:url => ENV['MOCKSTARTER_BRAIN'])
       @progress = progress
       @goal = (@goal.to_f * 100).round / 100.00
     end

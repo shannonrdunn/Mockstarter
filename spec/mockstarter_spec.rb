@@ -1,41 +1,36 @@
 require 'spec_helper'
 describe Mockstarter do
+  before(:all) do
+    @redis = Redis.new(:url => ENV['MOCKSTARTER_BRAIN'], :db => 2)
+    @project = Mockstarter::Project.new(:projectname => "test", :goal => 5000, :redis => @redis)
+    @fund = Mockstarter::Fund.new(:username => 'test_user', :projectname => "test", :amount => 5000, :creditcard => 4111111111111111, :redis => @redis)
+    @bad_card = Mockstarter::Fund.new(:creditcard => 4242424242424241, :redis => @redis)
+    @dupe_card = Mockstarter::Fund.new(:username => 'test_user_dupe', :projectname => "test", :amount => 5000, :creditcard => 4111111111111111, :redis => @redis)
+    @bad_project = Mockstarter::Project.new(:projectname => "tes*&^t", :goal => 5000, :redis => @redis)
+  end
+  after(:all) do
+    ## Flush redis db after tests are done
+    @redis.flushdb
+  end
   it 'has a version number' do
     expect(Mockstarter::VERSION).not_to be nil
   end
-
-  describe Mockstarter::Fund do
-    before do
-      @good_card = Mockstarter::Fund.new(:creditcard => 378282246310005)
-      @bad_card = Mockstarter::Fund.new(:creditcard => 4242424242424241)
-      @long_card = Mockstarter::Fund.new(:creditcard => 424242424242424121211231231232)
-      @string_card = Mockstarter::Fund.new(:creditcard => 3782822e46310005)
-    end
-    it 'good card number should pass card verification' do
-      @good_card.card_verify == true
-    end
-    it 'bad luhn card number should raise ArgumentError' do
-      expect { @bad_card.card_verify }.to raise_error(ArgumentError)
-    end
-    it 'long card number should raise ArgumentError' do
-      expect { @long_card.card_verify }.to raise_error(ArgumentError)
-    end
+  it 'creates a project with valid settings' do
+    expect(@project.create).to eq("OK")
   end
-
-  describe Mockstarter::Project do
-    before do
-      @good_name = Mockstarter::Project.new(:projectname => 'Project')
-      @short_name = Mockstarter::Project.new(:projectname => 'Pro')
-      @space_name = Mockstarter::Project.new(:projectname => 'Pro ')
-    end
-    it 'good name should pass name verification' do
-      @good_name.name_verify == true
-    end
-    it 'short name should raise ArgumentError' do
-      expect { @short_name.name_verify }.to raise_error(ArgumentError)
-    end
-    it 'space in project name should raise ArgumentError' do
-      expect { @space_name.name_verify }.to raise_error(ArgumentError)
-    end
+  it 'funds the project' do
+    expect(@fund.transaction).to eq(true)
+  end
+  it 'returns progress (funds) of test project' do
+    expect(@project.progress).to eq(5000)
+  end
+  it 'bad luhn card number should raise ArgumentError' do
+    expect { @bad_card.card_verify }.to raise_error(ArgumentError)
+  end
+  it 'detects duplicate card' do
+    expect  raise_error(ArgumentError)
+  end
+  it 'bad name of project causes error' do
+    expect { @bad_project.name_verify }.to raise_error(ArgumentError)
   end
 end

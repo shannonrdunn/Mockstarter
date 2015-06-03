@@ -6,21 +6,21 @@ require 'thor'
 class MockStarterCLI < Thor
   desc "project PROJECTNAME GOAL", "create a project by PROJECTNAME for given GOAL"
   def project(projectname, goal)
-    project = Mockstarter::Project.new(:projectname => projectname, :goal => goal)
+    project = Mockstarter::Project.new(:projectname => projectname, :goal => goal, :redis =>  Redis.new(:url => ENV['MOCKSTARTER_BRAIN']))
     project.create
     say "Created new campaign #{projectname} with goal of $#{goal}!"
   end
 
   desc "back USERNAME PROJECTNAME CREDITCARD AMOUNT", "fund a project for USERNAME to PROJECTNAME with CREDITCARD for AMOUNT"
   def back(name, projectname, creditcard, amount)
-    project = Mockstarter::Fund.new(:username => name, :projectname => projectname, :amount => amount, :creditcard => creditcard)
+    project = Mockstarter::Fund.new(:username => name, :projectname => projectname, :amount => amount, :creditcard => creditcard, :redis =>  Redis.new(:url => ENV['MOCKSTARTER_BRAIN']))
     project.transaction
     say "Backed #{projectname} with amount of $#{project.instance_variable_get(:@amount)}!"
   end
 
   desc "list PROJECTNAME", "show backers for PROJECTNAME"
   def list(projectname)
-    project = Mockstarter::Project.new(:projectname => projectname)
+    project = Mockstarter::Project.new(:projectname => projectname, :redis =>  Redis.new(:url => ENV['MOCKSTARTER_BRAIN']))
     project.log.each {|e| puts "-- " + e.sub(/(:*[:0-9][^\s]+)/,"") + "\n"}
     if project.funded == true
       puts "#{projectname} is SUCCESSFUL!"
@@ -31,7 +31,7 @@ class MockStarterCLI < Thor
 
   desc "backer USERNAME", "get projects backed by USERNAME"
   def backer(username)
-    project = Mockstarter::Fund.new(:username => username)
+    project = Mockstarter::Fund.new(:username => username, :redis =>  Redis.new(:url => ENV['MOCKSTARTER_BRAIN']))
     project.log.each {|e| puts "-- " + e.sub(/(:*[:0-9][^\s]+)/,"") + "\n"}
   end
 
