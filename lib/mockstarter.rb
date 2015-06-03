@@ -79,7 +79,6 @@ module Mockstarter
       all_users = @redis.smembers('user_set')
       all_users.delete(@username)
       all_users.map { |u|
-        puts u
         if @redis.get('user:creditcard:' + u) == @creditcard
           return true
         end
