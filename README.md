@@ -1,6 +1,6 @@
 # Mockstarter
 
-Mockstarter. Redis backed mini kickstarter.
+Mockstarter. Redis backed mini kickstarter. Allows for creating, funding, and viewing backs of mockstarter projects.
 
 ## Installation
 
