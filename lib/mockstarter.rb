@@ -56,7 +56,7 @@ module Mockstarter
       when duplicate_card == true
         fail ArgumentError, "Credit taken by another user"
       end
-      return true
+      true
     end
 
     def luhn_check
@@ -83,7 +83,7 @@ module Mockstarter
           return true
         end
       }
-      return false
+      false
     end
 
     def log
@@ -93,7 +93,7 @@ module Mockstarter
       transactions.map { |k,v|
         array.push("Backed #{k} for $#{v}")
       }
-      return array
+      array
     end
   end
 
@@ -131,7 +131,7 @@ module Mockstarter
       transactions.map { |k,v|
         total = total + v.to_i
       }
-      return total
+      total
     end
 
     def log
@@ -141,7 +141,7 @@ module Mockstarter
       transactions.map { |k,v|
         array.push("#{k} backed for $#{v}")
       }
-      return array
+      array
     end
 
     def funded
@@ -154,7 +154,7 @@ module Mockstarter
           return goal.to_i - @progress
         end
       end
-      return false
+      false
     end
 
     def name_verify
@@ -169,7 +169,7 @@ module Mockstarter
       when @redis.get('project:goal:' + @projectname) != nil
         fail ArgumentError, "Project already exists!"
       end
-        return true
+      true
     end
 
   end
