@@ -15,8 +15,14 @@ describe Mockstarter do
   it 'has a version number' do
     expect(Mockstarter::VERSION).not_to be nil
   end
+  it 'shows a project that does not exist as false' do
+    expect(@project.funded).to eq(false)
+  end
   it 'creates a project with valid settings' do
     expect(@project.create).to eq("OK")
+  end
+  it 'returns progress of an unfunded project' do
+    expect(@project.progress).to eq(0)
   end
   it 'funds the project' do
     expect(@fund.transaction).to eq(true)
@@ -28,9 +34,10 @@ describe Mockstarter do
     expect { @bad_card.card_verify }.to raise_error(ArgumentError)
   end
   it 'detects duplicate card' do
-    expect  raise_error(ArgumentError)
+    expect raise_error(ArgumentError)
   end
   it 'bad name of project causes error' do
     expect { @bad_project.name_verify }.to raise_error(ArgumentError)
   end
+
 end
