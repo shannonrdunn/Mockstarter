@@ -27,6 +27,8 @@ class MockStarterCLI < Thor
     project.log.each {|e| puts "-- " + e.sub(/(:*[:0-9][^\s]+)/,"") + "\n"}
     if project.funded == true
       puts "#{projectname} is SUCCESSFUL!"
+    elsif project.funded == false
+      puts "#{projectname} doesn't exist. Create it!"
     else
       puts "#{projectname} needs $#{project.funded} more to be SUCCESSFUL"
     end
