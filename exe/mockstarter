@@ -3,6 +3,9 @@
 require 'mockstarter'
 require 'thor'
 
+## CLI for Mockstarter. Takes input and creates objects to manipulate as the user wants.
+## Some workarounds in here are string manipulation on to delete ids from usernames (i am catting them together in redis)
+
 class MockStarterCLI < Thor
   desc "project PROJECTNAME GOAL", "create a project by PROJECTNAME for given GOAL"
   def project(projectname, goal)
