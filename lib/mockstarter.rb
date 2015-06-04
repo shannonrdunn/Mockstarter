@@ -32,6 +32,8 @@ module Mockstarter
     def transaction
       ## Call this method on the object and it will verify your card number
       ## and then pass the values to fund the project
+      ## Note here the transaction id as a unix epoch. =/ not the best.. 
+      ## Just needed a unique value.
       unless card_verify == false
         @redis.sadd('user_set', @username)
           id = Time.now.to_i.to_s
