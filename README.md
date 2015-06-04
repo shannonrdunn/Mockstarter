@@ -4,8 +4,6 @@ Mockstarter. Redis backed mini kickstarter. Allows for creating, funding, and vi
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
 Git clone this repo
 ```ruby
 git clone https://github.com/shannonrdunn/Mockstarter
