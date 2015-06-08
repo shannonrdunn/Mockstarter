@@ -31,13 +31,13 @@ describe Mockstarter do
     expect(@project.progress).to eq(5000)
   end
   it 'bad luhn card number should raise ArgumentError' do
-    expect { @bad_card.card_verify }.to raise_error(ArgumentError)
+    expect { @bad_card.verify_input }.to raise_error(ArgumentError)
   end
   it 'detects duplicate card' do
     expect raise_error(ArgumentError)
   end
   it 'bad name of project causes error' do
-    expect { @bad_project.name_verify }.to raise_error(ArgumentError)
+    expect { @bad_project.verify_input }.to raise_error(ArgumentError)
   end
 
 end

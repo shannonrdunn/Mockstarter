@@ -32,11 +32,11 @@ module Mockstarter
     def transaction
       ## Call this method on the object and it will verify your card number
       ## and then pass the values to fund the project
-      ## Note here the transaction id as a unix epoch. =/ not the best.. 
+      ## Note here the transaction id as a unix epoch. =/ not the best..
       ## Just needed a unique value.
-      unless card_verify == false
+      unless verify_input == false
         @redis.sadd('user_set', @username)
-          id = Time.now.to_i.to_s
+          id = transaction_id.to_s
           @redis.set('user:creditcard:' + @username,
                         @creditcard)
           @redis.hset('user:transaction:' + @username,
@@ -48,8 +48,19 @@ module Mockstarter
       end
     end
 
-    def card_verify
-      ## Credit card verifications tests
+    def transaction_id
+      unless (n = @redis.get('user:id_tracker:' + @username)) == nil
+        @redis.get('user:id_tracker:' + @username)
+        @redis.set('user:id_tracker:' + @username, n.to_i + 1)
+        return n
+      else
+        @redis.set('user:id_tracker:' + @username, 0)
+        n = 0
+      end
+    end
+
+    def verify_input
+      ## Verify various inputs
       case
       when @creditcard.to_s.size > 19
         fail ArgumentError, "Credit card number too large (must be less than 19)."
@@ -57,6 +68,8 @@ module Mockstarter
         fail ArgumentError, "Not valid card."
       when duplicate_card == true
         fail ArgumentError, "Credit taken by another user"
+      when @redis.get('project:goal:' + @projectname) == nil
+        fail ArgumentError, "Can't fund non existent project! Create it!"
       end
       true
     end
@@ -120,7 +133,7 @@ module Mockstarter
 
     def create
       ## Ensure name passes verification, then create the project in redis.
-      unless name_verify == false
+      unless verify_input == false
         @redis.set('project:goal:' + @projectname,
                      @goal)
       end
@@ -159,7 +172,7 @@ module Mockstarter
       false
     end
 
-    def name_verify
+    def verify_input
       ## Tests for size, and characters in string, and if it already exists.
       case
       when @projectname.size < 4
