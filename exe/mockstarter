@@ -37,7 +37,7 @@ class MockStarterCLI < Thor
   desc "backer USERNAME", "get projects backed by USERNAME"
   def backer(username)
     project = Mockstarter::Fund.new(:username => username, :redis =>  Redis.new(:url => ENV['MOCKSTARTER_BRAIN']))
-    project.log.each {|e| puts "-- " + e.sub(/(:*[:0-9][^\s]+)/,"") + "\n"}
+    project.log.each {|e| puts "-- " + e.sub(/(:*[:0-9a-z][^\s]+)/,"") + "\n"}
   end
 
 end

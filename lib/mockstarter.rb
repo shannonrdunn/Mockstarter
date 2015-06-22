@@ -1,6 +1,8 @@
 require "mockstarter/version"
 require "redis"
 require "json"
+require "securerandom"
+
 
 
 ## Core Mockstarter module
@@ -36,7 +38,7 @@ module Mockstarter
       ## Just needed a unique value.
       unless verify_input == false
         @redis.sadd('user_set', @username)
-          id = transaction_id.to_s
+          id = transaction_id
           @redis.set('user:creditcard:' + @username,
                         @creditcard)
           @redis.hset('user:transaction:' + @username,
@@ -49,14 +51,7 @@ module Mockstarter
     end
 
     def transaction_id
-      unless (n = @redis.get('user:id_tracker:' + @username)) == nil
-        @redis.get('user:id_tracker:' + @username)
-        @redis.set('user:id_tracker:' + @username, n.to_i + 1)
-        return n
-      else
-        @redis.set('user:id_tracker:' + @username, 0)
-        n = 0
-      end
+      SecureRandom.uuid
     end
 
     def verify_input
